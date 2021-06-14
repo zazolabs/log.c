@@ -142,6 +142,15 @@ static void init_event(log_Event *ev, void *udata) {
     time_t t = time(NULL);
     ev->time = localtime(&t);
   }
+}
+
+
+void log_log(int level, const char *file, int line, const char *fmt, ...) {
+  if (level < L.level) {
+    return;
+  } else if (L.quiet && !L.fp) {
+    return;
+  }
   ev->udata = udata;
 }
 
