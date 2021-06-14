@@ -61,9 +61,6 @@ static inline const char *get_level_color(int level)
 #endif
 
 
-
-
-
 static void stdout_callback(log_Event *ev) {
   char buf[16];
   buf[strftime(buf, sizeof(buf), "%H:%M:%S", ev->time)] = '\0';
@@ -144,15 +141,6 @@ static void init_event(log_Event *ev, void *udata) {
   }
 }
 
-
-void log_log(int level, const char *file, int line, const char *fmt, ...) {
-  if (level < L.level) {
-    return;
-  } else if (L.quiet && !L.fp) {
-    return;
-  }
-  ev->udata = udata;
-}
 
 
 void log_log(int level, const char *file, int line, const char *fmt, ...) {
