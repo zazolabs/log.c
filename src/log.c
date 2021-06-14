@@ -139,6 +139,7 @@ static void init_event(log_Event *ev, void *udata) {
     time_t t = time(NULL);
     ev->time = localtime(&t);
   }
+  ev->udata = udata;
 }
 
 
