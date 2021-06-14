@@ -21,7 +21,7 @@
  */
 
 #include "log.h"
-
+#include <sys/time.h>
 #define MAX_CALLBACKS 32
 
 typedef struct {
@@ -61,33 +61,42 @@ static inline const char *get_level_color(int level)
 #endif
 
 
-static void stdout_callback(log_Event *ev) {
-  char buf[16];
-  buf[strftime(buf, sizeof(buf), "%H:%M:%S", ev->time)] = '\0';
+static void stdout_callback(log_Event *ev)
+{
+    struct timeval curTime;
+    int milli;
+    char buffer [80];
+    gettimeofday(&curTime, NULL);
+
+    milli = curTime.tv_usec / 1000;
+    strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", localtime(&curTime.tv_sec));
 #ifdef LOG_USE_COLOR
   fprintf(
-    ev->udata, "%s %s%-7s\x1b[0m \x1b[90m%s:%d:\x1b[0m ",
-    buf, get_level_color(ev->level), get_level_string(ev->level),
+    ev->udata, "%s:%03d %s%-7s\x1b[0m \x1b[90m%s:%d:\x1b[0m ",
+    buffer, milli, get_level_color(ev->level), get_level_string(ev->level),
     ev->file, ev->line);
 #else
   fprintf(
-    ev->udata, "%s %-7s %s:%d: ",
-    buf, get_level_string(ev->level), ev->file, ev->line);
+    ev->udata, "%s:%03d %-7s %s:%d: ",
+    buffer, milli, get_level_string(ev->level), ev->file, ev->line);
 #endif
   vfprintf(ev->udata, ev->fmt, ev->ap);
-  fprintf(ev->udata, "\n");
   fflush(ev->udata);
 }
 
 
 static void file_callback(log_Event *ev) {
-  char buf[64];
-  buf[strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", ev->time)] = '\0';
+    struct timeval curTime;
+    int milli;
+    char buffer [80];
+    gettimeofday(&curTime, NULL);
+
+    milli = curTime.tv_usec / 1000;
+    strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", localtime(&curTime.tv_sec));
   fprintf(
-    ev->udata, "%s %-7s %s:%d: ",
-    buf, get_level_string(ev->level), ev->file, ev->line);
+    ev->udata, "%s:%03d %-7s %s:%d: ",
+    buffer, milli, get_level_string(ev->level), ev->file, ev->line);
   vfprintf(ev->udata, ev->fmt, ev->ap);
-  fprintf(ev->udata, "\n");
   fflush(ev->udata);
 }
 
